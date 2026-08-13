@@ -1,0 +1,7 @@
+{
+  "name": "sentinel-exe-terms",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
