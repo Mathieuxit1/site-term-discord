@@ -1,5 +1,5 @@
 {
-  "name": "sentinel-exe-terms",
+  "name": "sentinel-exe-site",
   "private": true,
   "engines": {
     "node": ">=20"

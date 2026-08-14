@@ -3,95 +3,168 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Les conditions d’utilisation et le contact de Sentinel.exe." />
-    <meta name="theme-color" content="#0b132b" />
-    <title>Conditions d’utilisation | Sentinel.exe</title>
+    <meta name="description" content="Sentinel.exe protège les serveurs Discord contre les raids, le spam et les comportements suspects." />
+    <meta name="theme-color" content="#07111f" />
+    <meta property="og:title" content="Sentinel.exe — Protection anti-raid pour Discord" />
+    <meta property="og:description" content="Protège ton serveur Discord contre les raids, le spam et les comportements suspects." />
+    <meta property="og:image" content="https://site-term-discord.vercel.app/assets/sentinel-share-card.png" />
+    <meta property="og:type" content="website" />
+    <title>Sentinel.exe — Protection anti-raid pour Discord</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   </head>
   <body>
-    <main id="top">
-      <header class="hero">
-        <div class="shell">
-          <a class="brand" href="#top" aria-label="Retour en haut de page">
+    <main>
+      <header class="site-header">
+        <div class="shell navigation">
+          <a class="brand" href="#top" aria-label="Accueil Sentinel.exe">
             <span class="brand-mark" aria-hidden="true">◆</span>
             SENTINEL.EXE
           </a>
-          <p class="eyebrow">Informations légales</p>
-          <h1>Conditions d’utilisation</h1>
-          <p class="lead">Les règles simples qui encadrent l’utilisation de Sentinel.exe.</p>
-          <p class="updated">Dernière mise à jour : 14 août 2026</p>
+          <nav aria-label="Navigation principale">
+            <a href="#fonctionnalites">Protections</a>
+            <a href="#demarrage">Démarrage</a>
+            <a href="#support">Support</a>
+            <a href="/conditions">Conditions</a>
+          </nav>
+          <button class="nav-action" id="open-contact-nav" type="button">Demander l’accès</button>
         </div>
       </header>
 
-      <div class="shell layout">
-        <aside class="summary" aria-label="Sommaire">
-          <p>Sommaire</p>
-          <nav>
-            <a href="#acceptation">Acceptation</a>
-            <a href="#utilisation">Utilisation</a>
-            <a href="#donnees">Données personnelles</a>
-            <a href="#responsabilite">Responsabilité</a>
-            <a href="#modifications">Modifications</a>
-            <a href="#contact">Contact</a>
-          </nav>
-        </aside>
+      <section class="hero" id="top">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> Protection Discord active</p>
+            <h1>Protège ton serveur avant que le raid commence.</h1>
+            <p class="lead">Sentinel.exe combine anti-raid, anti-spam, quarantaine et modération pour aider ton équipe à garder le contrôle.</p>
+            <div class="hero-actions">
+              <button class="button-primary" id="open-contact" type="button">Demander l’accès <span aria-hidden="true">→</span></button>
+              <a class="button-ghost" href="#fonctionnalites">Découvrir les protections</a>
+            </div>
+            <p class="hero-note">Configuration directement sur Discord avec <code>/setup</code>.</p>
+          </div>
 
-        <article class="terms">
-          <section id="acceptation">
-            <p class="number">01</p>
-            <h2>Acceptation des conditions</h2>
-            <p>En invitant, en utilisant ou en interagissant avec Sentinel.exe, vous acceptez les présentes conditions d’utilisation. Si vous n’êtes pas d’accord avec l’une de ces conditions, veuillez ne pas utiliser Sentinel.exe.</p>
-            <p>Vous devez également respecter les conditions d’utilisation de Discord, ainsi que les règles des serveurs sur lesquels Sentinel.exe est disponible.</p>
-          </section>
+          <div class="status-card" aria-label="Aperçu de la protection Sentinel.exe">
+            <div class="status-topline"><span class="live-dot" aria-hidden="true"></span> SYSTÈME DE PROTECTION</div>
+            <div class="shield-mark" aria-hidden="true">◇</div>
+            <h2>Sentinel.exe veille.</h2>
+            <p>Une réponse claire quand ton serveur en a besoin.</p>
+            <div class="status-list">
+              <div><span class="check">✓</span><span>Anti-raid configuré</span><strong>ACTIF</strong></div>
+              <div><span class="check">✓</span><span>Anti-spam en surveillance</span><strong>ACTIF</strong></div>
+              <div><span class="check">✓</span><span>Logs de sécurité</span><strong>PRÊT</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <section id="utilisation">
-            <p class="number">02</p>
-            <h2>Utilisation autorisée</h2>
-            <p>Vous vous engagez à utiliser Sentinel.exe de manière légale, respectueuse et raisonnable. Il est notamment interdit de :</p>
+      <section class="trust-strip" aria-label="Fonctions principales">
+        <div class="shell trust-items">
+          <p><span>01</span> Anti-raid intelligent</p>
+          <p><span>02</span> Modération intégrée</p>
+          <p><span>03</span> Configuration par serveur</p>
+        </div>
+      </section>
+
+      <section class="section shell" id="fonctionnalites">
+        <div class="section-heading">
+          <p class="eyebrow dark"><span></span> Protection pensée pour Discord</p>
+          <h2>Les bons réflexes, automatisés.</h2>
+          <p>Pas besoin d’un panel compliqué : les réglages essentiels sont accessibles à ton équipe directement sur le serveur.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card featured">
+            <p class="card-number">01</p>
+            <div class="feature-icon" aria-hidden="true">⌁</div>
+            <h3>Anti-raid réactif</h3>
+            <p>Sentinel.exe surveille les arrivées inhabituelles et peut isoler les comptes à risque ou déclencher un lockdown.</p>
             <ul>
-              <li>utiliser Sentinel.exe pour harceler, menacer ou nuire à autrui ;</li>
-              <li>tenter de contourner ses limites, ses permissions ou sa sécurité ;</li>
-              <li>envoyer automatiquement ou massivement des commandes afin de perturber le service ;</li>
-              <li>utiliser Sentinel.exe à des fins frauduleuses, illégales ou contraires aux règles de Discord ;</li>
-              <li>revendiquer que Sentinel.exe est affilié à Discord alors qu’il ne l’est pas.</li>
+              <li>Seuils adaptés à chaque serveur</li>
+              <li>Liste blanche de membres fiables</li>
             </ul>
-            <p>L’accès à Sentinel.exe peut être limité, suspendu ou retiré en cas de non-respect de ces conditions ou pour protéger le bon fonctionnement du service.</p>
-          </section>
+          </article>
+          <article class="feature-card">
+            <p class="card-number">02</p>
+            <div class="feature-icon" aria-hidden="true">✦</div>
+            <h3>Anti-spam utile</h3>
+            <p>Les floods, messages répétés et abus de mentions sont détectés pour garder les salons lisibles.</p>
+            <ul>
+              <li>Suppression des messages suspects</li>
+              <li>Timeout automatique configurable</li>
+            </ul>
+          </article>
+          <article class="feature-card">
+            <p class="card-number">03</p>
+            <div class="feature-icon" aria-hidden="true">▣</div>
+            <h3>Modération claire</h3>
+            <p>Les commandes nécessaires à une équipe de modération restent simples, rapides et cohérentes.</p>
+            <ul>
+              <li>Ban, kick, timeout, avertissements</li>
+              <li>Journal de sécurité dédié</li>
+            </ul>
+          </article>
+          <article class="feature-card">
+            <p class="card-number">04</p>
+            <div class="feature-icon" aria-hidden="true">⚙</div>
+            <h3>Réglages sans Pterodactyl</h3>
+            <p>Chaque administrateur configure son propre serveur via une interface privée, ouverte avec une seule commande.</p>
+            <ul>
+              <li>Panneau <code>/setup</code></li>
+              <li>Paramètres enregistrés par serveur</li>
+            </ul>
+          </article>
+        </div>
+      </section>
 
-          <section id="donnees">
-            <p class="number">03</p>
-            <h2>Données personnelles et confidentialité</h2>
-            <p>Sentinel.exe ne traite que les informations nécessaires à son fonctionnement, par exemple les identifiants Discord, les identifiants de serveurs et de salons, les paramètres configurés par les administrateurs, ainsi que les données créées directement via ses commandes.</p>
-            <p>Ces informations ne sont ni vendues ni louées. Elles peuvent être conservées pendant la durée nécessaire au fonctionnement de Sentinel.exe, à la sécurité du service et au respect d’obligations légales éventuelles. Elles sont supprimées ou anonymisées lorsqu’elles ne sont plus nécessaires.</p>
-            <p>Sentinel.exe ne vous demande jamais votre mot de passe Discord. N’envoyez aucune information sensible dans les commandes ou messages destinés à Sentinel.exe.</p>
-          </section>
+      <section class="workflow-section" id="demarrage">
+        <div class="shell workflow-grid">
+          <div>
+            <p class="eyebrow"><span></span> Mise en route</p>
+            <h2>Prêt en quelques étapes.</h2>
+            <p class="workflow-lead">Le bot est conçu pour rester simple à installer, puis personnalisable selon les besoins de ton serveur.</p>
+            <button class="button-primary" id="open-contact-setup" type="button">Demander l’accès <span aria-hidden="true">→</span></button>
+          </div>
+          <ol class="steps">
+            <li><span>01</span><div><h3>Ajoute Sentinel.exe</h3><p>Invite le bot sur ton serveur avec les permissions nécessaires.</p></div></li>
+            <li><span>02</span><div><h3>Ouvre <code>/setup</code></h3><p>Choisis le salon de logs, active les protections et règle les seuils.</p></div></li>
+            <li><span>03</span><div><h3>Garde le contrôle</h3><p>Utilise les commandes de modération pendant que Sentinel.exe surveille le reste.</p></div></li>
+          </ol>
+        </div>
+      </section>
 
-          <section id="responsabilite">
-            <p class="number">04</p>
-            <h2>Disponibilité et responsabilité</h2>
-            <p>Sentinel.exe est fourni « en l’état » et peut être modifié, interrompu ou indisponible temporairement, notamment lors de maintenances, de mises à jour ou d’incidents techniques. Aucun niveau de disponibilité continu n’est garanti.</p>
-            <p>Dans les limites autorisées par la loi, l’éditeur de Sentinel.exe ne pourra être tenu responsable des dommages indirects, pertes de données, pertes d’opportunité ou conséquences résultant de l’utilisation ou de l’indisponibilité de Sentinel.exe.</p>
-          </section>
+      <section class="section shell command-section">
+        <div class="section-heading compact">
+          <p class="eyebrow dark"><span></span> Commandes essentielles</p>
+          <h2>Un bot qui parle le langage des modos.</h2>
+        </div>
+        <div class="commands" aria-label="Exemples de commandes">
+          <div><code>/setup</code><span>Configurer le serveur</span></div>
+          <div><code>/antiraid status</code><span>Voir l’état des protections</span></div>
+          <div><code>/timeout</code><span>Isoler temporairement un membre</span></div>
+          <div><code>/ban</code><span>Retirer un membre du serveur</span></div>
+        </div>
+      </section>
 
-          <section id="modifications">
-            <p class="number">05</p>
-            <h2>Évolutions des conditions</h2>
-            <p>Ces conditions peuvent être mises à jour à tout moment afin de refléter l’évolution de Sentinel.exe, de ses fonctionnalités ou du cadre applicable. La date de dernière mise à jour affichée en haut de cette page fait foi. La poursuite de l’utilisation de Sentinel.exe après une mise à jour vaut acceptation des nouvelles conditions.</p>
-          </section>
-
-          <section id="contact" class="contact-card">
-            <p class="number">06</p>
-            <h2>Nous contacter</h2>
-            <p>Une question, un problème ou une suggestion ? Envoie ta demande directement à l’équipe de développement.</p>
-            <button class="contact-button" id="open-contact" type="button">Demander de l’aide</button>
-            <p class="contact-note">Ta demande sera envoyée à l’owner de Sentinel.exe. Ton identifiant Discord est nécessaire pour recevoir la réponse du bot en message privé.</p>
-          </section>
-
-          <p class="disclaimer">Discord est une marque déposée de Discord Inc. Sentinel.exe est un service indépendant et n’est ni approuvé ni affilié à Discord Inc.</p>
-        </article>
-      </div>
+      <section class="support-section" id="support">
+        <div class="shell support-card">
+          <div>
+            <p class="eyebrow"><span></span> Support Sentinel.exe</p>
+            <h2>Une question ou une demande ?</h2>
+            <p>Décris ton besoin à l’équipe de développement. Tu recevras la réponse directement en message privé Discord.</p>
+          </div>
+          <button class="button-primary support-button" id="open-contact-support" type="button">Contacter l’équipe <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
     </main>
+
+    <footer>
+      <div class="shell footer-content">
+        <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">◆</span>SENTINEL.EXE</a>
+        <p>Protection anti-raid et modération pour Discord.</p>
+        <a href="/conditions">Conditions d’utilisation</a>
+        <span>© 2026 Sentinel.exe</span>
+      </div>
+    </footer>
 
     <dialog class="contact-dialog" id="contact-dialog" aria-labelledby="contact-title">
       <div class="dialog-heading">
@@ -115,17 +188,15 @@
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
         <div class="form-actions">
           <button class="button-secondary" id="cancel-contact" type="button">Annuler</button>
-          <button class="contact-button" id="submit-contact" type="submit">Envoyer la demande</button>
+          <button class="button-primary" id="submit-contact" type="submit">Envoyer la demande</button>
         </div>
       </form>
     </dialog>
 
-    <footer><div class="shell">© 2026 — Conditions d’utilisation de Sentinel.exe</div></footer>
-
     <script>
       const dialog = document.querySelector('#contact-dialog');
       const form = document.querySelector('#contact-form');
-      const openButton = document.querySelector('#open-contact');
+      const openButtons = document.querySelectorAll('[id^="open-contact"]');
       const closeButtons = [document.querySelector('#close-contact'), document.querySelector('#cancel-contact')];
       const submitButton = document.querySelector('#submit-contact');
       const status = document.querySelector('#form-status');
@@ -136,6 +207,11 @@
       function setStatus(message, type = '') {
         status.className = `form-status ${type}`;
         status.textContent = message;
+      }
+
+      function openDialog() {
+        dialog.showModal();
+        form.elements.name.focus();
       }
 
       function closeDialog() {
@@ -165,7 +241,7 @@
         }
       }
 
-      openButton.addEventListener('click', () => { dialog.showModal(); form.elements.name.focus(); });
+      openButtons.forEach((button) => button.addEventListener('click', openDialog));
       closeButtons.forEach((button) => button.addEventListener('click', closeDialog));
       dialog.addEventListener('click', (event) => { if (event.target === dialog) closeDialog(); });
 
