@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Espace d’administration Sentinel.exe." />
+    <meta name="theme-color" content="#07111f" />
+    <title>Espace admin | Sentinel.exe</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body class="dashboard-body">
+    <header class="dashboard-header">
+      <div class="shell navigation">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">◆</span>SENTINEL.EXE</a>
+        <nav aria-label="Navigation principale"><a href="/">Accueil</a><a href="/conditions">Conditions</a></nav>
+        <button class="nav-action hidden" id="logout-button" type="button">Se déconnecter</button>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="shell">
+        <section class="dashboard-intro">
+          <p class="eyebrow"><span></span> Espace d’administration</p>
+          <h1>Le contrôle de ton serveur, au même endroit.</h1>
+          <p>Connecte-toi avec Discord pour modifier uniquement les serveurs que tu administres.</p>
+        </section>
+
+        <section class="dashboard-login" id="login-screen">
+          <div class="login-symbol" aria-hidden="true">◇</div>
+          <h2>Connexion sécurisée avec Discord</h2>
+          <p>Sentinel.exe vérifie ton rôle d’administrateur avant d’afficher les réglages de tes serveurs.</p>
+          <a class="button-primary" href="/api/dashboard-login">Se connecter avec Discord <span aria-hidden="true">→</span></a>
+          <p class="login-note" id="login-message">Aucun mot de passe Discord ne passe par Sentinel.exe.</p>
+        </section>
+
+        <section class="dashboard-app hidden" id="dashboard-app" aria-live="polite">
+          <div class="dashboard-toolbar">
+            <div>
+              <p class="eyebrow dark"><span></span> Serveur sélectionné</p>
+              <label class="guild-picker" for="guild-select">Choisir un serveur
+                <select id="guild-select" aria-label="Choisir un serveur Discord"></select>
+              </label>
+            </div>
+            <div class="account-chip"><span class="account-avatar" id="account-avatar" aria-hidden="true">S</span><span id="account-name">Discord</span></div>
+          </div>
+
+          <p class="dashboard-status" id="dashboard-status" role="status"></p>
+
+          <form id="settings-form" class="settings-form">
+            <section class="settings-card wide">
+              <div class="card-heading"><div><p class="card-kicker">SURVEILLANCE</p><h2>Protection générale</h2><p>Active ou coupe les protections principales de ce serveur.</p></div><span class="card-badge">V1</span></div>
+              <div class="toggle-grid">
+                <label class="toggle-row"><span><strong>Anti-raid</strong><small>Détection des arrivées inhabituelles et quarantaine.</small></span><input id="antiraid-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Lockdown automatique</strong><small>Bloque les salons lors d’un raid critique.</small></span><input id="auto-lockdown-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Anti-spam</strong><small>Surveille les floods, doublons et mentions abusives.</small></span><input id="antispam-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Quarantaine renforcée</strong><small>Met tous les nouveaux membres en quarantaine au niveau critique.</small></span><input id="critical-quarantine-all" type="checkbox" /><i aria-hidden="true"></i></label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="card-heading"><div><p class="card-kicker">JOURNAUX</p><h2>Salon de sécurité</h2><p>Les événements Sentinel.exe y seront envoyés.</p></div></div>
+              <label class="field-label" for="log-channel">Salon de journaux
+                <select id="log-channel"><option value="">Aucun salon sélectionné</option></select>
+              </label>
+              <p class="field-note" id="channel-note">Les salons visibles par le bot apparaîtront ici.</p>
+            </section>
+
+            <section class="settings-card">
+              <div class="card-heading"><div><p class="card-kicker">ARRIVÉES</p><h2>Seuils anti-raid</h2><p>Définis à partir de combien d’arrivées le bot doit réagir.</p></div></div>
+              <div class="input-grid">
+                <label class="field-label">Fenêtre (secondes)<input id="raid-window" type="number" min="10" max="3600" required /></label>
+                <label class="field-label">Alerte<input id="raid-warning" type="number" min="2" max="100" required /></label>
+                <label class="field-label">Critique<input id="raid-critical" type="number" min="3" max="200" required /></label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="card-heading"><div><p class="card-kicker">ANTI-SPAM</p><h2>Limites de messages</h2><p>Ces limites déclenchent le nettoyage et le timeout automatique.</p></div></div>
+              <div class="input-grid compact-inputs">
+                <label class="field-label">Fenêtre (s)<input id="spam-window" type="number" min="3" max="120" required /></label>
+                <label class="field-label">Messages<input id="spam-messages" type="number" min="2" max="30" required /></label>
+                <label class="field-label">Doublons<input id="spam-duplicates" type="number" min="2" max="20" required /></label>
+                <label class="field-label">Mentions<input id="spam-mentions" type="number" min="1" max="50" required /></label>
+                <label class="field-label">Timeout (min)<input id="spam-timeout" type="number" min="1" max="10080" required /></label>
+              </div>
+            </section>
+
+            <section class="settings-card wide">
+              <div class="card-heading"><div><p class="card-kicker">QUARANTAINE</p><h2>Comptes à risque</h2><p>Un score plus bas rend la réaction du bot plus sensible.</p></div></div>
+              <div class="input-grid risk-inputs">
+                <label class="field-label">Risque normal<input id="risk-normal" type="number" min="1" max="20" required /></label>
+                <label class="field-label">Risque pendant une alerte<input id="risk-warning" type="number" min="1" max="20" required /></label>
+              </div>
+            </section>
+
+            <div class="save-bar"><p>Après l’enregistrement, le bot applique les réglages en moins d’une minute.</p><button class="button-primary" id="save-button" type="submit">Enregistrer les réglages <span aria-hidden="true">→</span></button></div>
+          </form>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="panel.mjs"></script>
+  </body>
+</html>
