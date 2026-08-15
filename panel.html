@@ -47,9 +47,39 @@
 
           <p class="dashboard-status" id="dashboard-status" role="status"></p>
 
+          <section class="server-overview" aria-labelledby="selected-guild-name">
+            <div class="overview-server">
+              <p class="card-kicker">VUE D’ENSEMBLE</p>
+              <h2 id="selected-guild-name">Serveur Discord</h2>
+              <p>Voici l’état actuel de tes protections. Les modifications restent locales tant que tu n’enregistres pas.</p>
+            </div>
+            <div class="protection-pills" aria-label="État des protections">
+              <span class="status-pill" id="overview-antiraid">Anti-raid</span>
+              <span class="status-pill" id="overview-antispam">Anti-spam</span>
+              <span class="status-pill" id="overview-lockdown">Lockdown</span>
+              <span class="status-pill" id="overview-logs">Journaux</span>
+            </div>
+            <div class="sync-card" aria-live="polite">
+              <span class="sync-dot" id="sync-dot" aria-hidden="true"></span>
+              <div><strong id="sync-label">En attente du bot</strong><p id="sync-details">Le bot confirmera sa synchronisation ici.</p></div>
+            </div>
+          </section>
+
           <form id="settings-form" class="settings-form">
+            <section class="settings-card wide preset-card">
+              <div class="card-heading">
+                <div><p class="card-kicker">DÉMARRAGE RAPIDE</p><h2>Choisir un profil de protection</h2><p>Applique un point de départ, puis ajuste les réglages si tu le souhaites. Rien n’est envoyé au bot avant l’enregistrement.</p></div>
+                <button class="button-secondary reset-button" id="reset-settings" type="button">Réinitialiser</button>
+              </div>
+              <div class="preset-grid" role="group" aria-label="Profils de protection">
+                <button class="preset-button" data-preset="relaxed" type="button"><strong>Souple</strong><span>Moins sensible, pour une communauté calme.</span></button>
+                <button class="preset-button is-selected" data-preset="balanced" type="button"><strong>Équilibré</strong><span>Le réglage conseillé pour la plupart des serveurs.</span></button>
+                <button class="preset-button" data-preset="strict" type="button"><strong>Strict</strong><span>Réagit plus vite aux arrivées et au spam suspects.</span></button>
+              </div>
+            </section>
+
             <section class="settings-card wide">
-              <div class="card-heading"><div><p class="card-kicker">SURVEILLANCE</p><h2>Protection générale</h2><p>Active ou coupe les protections principales de ce serveur.</p></div><span class="card-badge">V1</span></div>
+              <div class="card-heading"><div><p class="card-kicker">SURVEILLANCE</p><h2>Protection générale</h2><p>Active ou coupe les protections principales de ce serveur.</p></div><span class="card-badge">V1.1</span></div>
               <div class="toggle-grid">
                 <label class="toggle-row"><span><strong>Anti-raid</strong><small>Détection des arrivées inhabituelles et quarantaine.</small></span><input id="antiraid-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
                 <label class="toggle-row"><span><strong>Lockdown automatique</strong><small>Bloque les salons lors d’un raid critique.</small></span><input id="auto-lockdown-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
@@ -86,7 +116,7 @@
               </div>
             </section>
 
-            <section class="settings-card wide">
+            <section class="settings-card">
               <div class="card-heading"><div><p class="card-kicker">QUARANTAINE</p><h2>Comptes à risque</h2><p>Un score plus bas rend la réaction du bot plus sensible.</p></div></div>
               <div class="input-grid risk-inputs">
                 <label class="field-label">Risque normal<input id="risk-normal" type="number" min="1" max="20" required /></label>
