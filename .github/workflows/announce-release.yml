@@ -1,0 +1,68 @@
+name: Annoncer une mise à jour Sentinel.exe
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  discord-announcement:
+    name: Publier l’annonce Discord
+    runs-on: ubuntu-latest
+    steps:
+      - name: Envoyer les notes de mise à jour
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_UPDATE_WEBHOOK }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_NOTES: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          node <<'NODE'
+          const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+          if (!webhookUrl) {
+            throw new Error("Le secret DISCORD_UPDATE_WEBHOOK est absent.");
+          }
+
+          const clip = (value, maximum) => {
+            const text = String(value || "").trim();
+            return text.length > maximum ? `${text.slice(0, maximum - 1)}…` : text;
+          };
+
+          const version = clip(process.env.RELEASE_TAG, 100);
+          const releaseName = clip(process.env.RELEASE_NAME || version, 220);
+          const notes = clip(
+            process.env.RELEASE_NOTES || "Les notes de cette mise à jour seront ajoutées prochainement.",
+            3_900,
+          );
+          const payload = {
+            username: "Sentinel.exe",
+            allowed_mentions: { parse: [] },
+            embeds: [
+              {
+                title: `Sentinel.exe — ${releaseName}`,
+                url: process.env.RELEASE_URL,
+                description: notes,
+                color: 0xF4B942,
+                fields: [
+                  { name: "Version", value: version || "Non précisée", inline: true },
+                  { name: "Dépôt", value: process.env.REPOSITORY, inline: true },
+                ],
+                footer: { text: "Sentinel.exe • Journal des mises à jour" },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) {
+            throw new Error(`Discord a refusé l’annonce (${response.status}).`);
+          }
+          NODE
