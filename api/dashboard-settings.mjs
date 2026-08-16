@@ -19,6 +19,16 @@ function selectedGuild(request, session) {
   return getManagedGuild(session, guildId);
 }
 
+async function lastBotSyncAt() {
+  try {
+    const rows = await (await supabase("dashboard_sync_status?id=eq.1&select=last_sync_at&limit=1")).json();
+    return Array.isArray(rows) && rows[0]?.last_sync_at ? rows[0].last_sync_at : null;
+  } catch {
+    // The dashboard remains available while the optional V1.1 migration is pending.
+    return null;
+  }
+}
+
 export default {
   async fetch(request) {
     try {
@@ -29,8 +39,11 @@ export default {
 
       if (request.method === "GET") {
         const query = `dashboard_guild_settings?guild_id=eq.${encodeURIComponent(guild.id)}&select=*&limit=1`;
-        const rows = await (await supabase(query)).json();
-        return json({ ok: true, guild, settings: { ...DEFAULT_SETTINGS, ...(rows[0] || {}) } });
+        const [rows, last_sync_at] = await Promise.all([
+          (await supabase(query)).json(),
+          lastBotSyncAt(),
+        ]);
+        return json({ ok: true, guild, settings: { ...DEFAULT_SETTINGS, ...(rows[0] || {}) }, last_sync_at });
       }
 
       if (request.method !== "PUT") return json({ ok: false, message: "Méthode non autorisée." }, 405);

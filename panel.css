@@ -66,6 +66,11 @@
 .field-label select, .field-label input { width: 100%; min-height: 43px; border: 1px solid #c9d1dc; border-radius: 5px; padding: 9px 10px; color: #203147; background: #fff; }
 .field-label select:focus, .field-label input:focus { outline: 3px solid #f4b94255; border-color: #a46b05; }
 .field-note { margin: 10px 0 0; color: #708095; font-size: 12px; }
+.verification-card { display: grid; align-content: start; gap: 17px; }
+.verification-card .card-heading { margin-bottom: 0; }
+.verification-toggle { margin: 0; }
+.verification-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.verification-help { margin: 0; padding: 12px 13px; border-left: 3px solid #d89b20; color: #627186; background: #fff8e7; font-size: 12px; line-height: 1.45; }
 .input-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
 .compact-inputs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .risk-inputs { max-width: 460px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -93,6 +98,7 @@
   .sync-card { grid-column: auto; }
   .card-heading { align-items: flex-start; flex-direction: column; }
   .input-grid, .compact-inputs, .risk-inputs { grid-template-columns: 1fr 1fr; }
+  .verification-inputs { grid-template-columns: 1fr; }
   .save-bar { align-items: stretch; flex-direction: column; }
   .save-bar .button-primary, .reset-button { width: 100%; }
 }

@@ -11,6 +11,9 @@ const saveButton = document.querySelector("#save-button");
 const resetButton = document.querySelector("#reset-settings");
 const logChannel = document.querySelector("#log-channel");
 const channelNote = document.querySelector("#channel-note");
+const verificationChannel = document.querySelector("#verification-channel");
+const verificationRole = document.querySelector("#verification-role");
+const verificationNote = document.querySelector("#verification-note");
 const selectedGuildName = document.querySelector("#selected-guild-name");
 const syncDot = document.querySelector("#sync-dot");
 const syncLabel = document.querySelector("#sync-label");
@@ -33,6 +36,9 @@ const DEFAULT_SETTINGS = Object.freeze({
   spam_duplicate_limit: 3,
   spam_mention_limit: 5,
   spam_timeout_minutes: 10,
+  verification_enabled: false,
+  verification_channel_id: null,
+  verification_role_id: null,
 });
 
 const PRESETS = Object.freeze({
@@ -74,6 +80,9 @@ const fields = {
   antispam_enabled: document.querySelector("#antispam-enabled"),
   critical_quarantine_all: document.querySelector("#critical-quarantine-all"),
   security_log_channel_id: logChannel,
+  verification_enabled: document.querySelector("#verification-enabled"),
+  verification_channel_id: verificationChannel,
+  verification_role_id: verificationRole,
   raid_window_seconds: document.querySelector("#raid-window"),
   raid_warning_joins: document.querySelector("#raid-warning"),
   raid_critical_joins: document.querySelector("#raid-critical"),
@@ -110,37 +119,51 @@ function completeSettings(settings) {
   return { ...DEFAULT_SETTINGS, ...(settings || {}) };
 }
 
-function populateChannels(channels, selectedChannelId) {
-  logChannel.innerHTML = '<option value="">Aucun salon sélectionné</option>';
-  for (const channel of channels) {
+function populateSelect(select, items, selectedId, emptyLabel, labelFor, unavailableLabel) {
+  select.innerHTML = `<option value="">${emptyLabel}</option>`;
+  for (const item of items) {
     const option = document.createElement("option");
-    option.value = channel.id;
-    option.textContent = `#${channel.name}`;
-    logChannel.append(option);
+    option.value = item.id;
+    option.textContent = labelFor(item);
+    select.append(option);
   }
-  if (selectedChannelId && !channels.some((channel) => channel.id === selectedChannelId)) {
+  if (selectedId && !items.some((item) => item.id === selectedId)) {
     const savedOption = document.createElement("option");
-    savedOption.value = selectedChannelId;
-    savedOption.textContent = "Salon enregistré (inaccessible pour le moment)";
-    logChannel.append(savedOption);
+    savedOption.value = selectedId;
+    savedOption.textContent = unavailableLabel;
+    select.append(savedOption);
   }
-  logChannel.value = selectedChannelId || "";
+  select.value = selectedId || "";
+}
+
+function populateChannels(channels, selectedChannelId) {
+  populateSelect(logChannel, channels, selectedChannelId, "Aucun salon sélectionné", (channel) => `#${channel.name}`, "Salon enregistré (inaccessible pour le moment)");
+}
+
+function populateVerificationChannels(channels, selectedChannelId) {
+  populateSelect(verificationChannel, channels, selectedChannelId, "Choisir un salon", (channel) => `#${channel.name}`, "Salon enregistré (inaccessible pour le moment)");
+}
+
+function populateRoles(roles, selectedRoleId) {
+  populateSelect(verificationRole, roles, selectedRoleId, "Choisir un rôle", (role) => `@${role.name}`, "Rôle enregistré (inaccessible pour le moment)");
 }
 
 function fillSettings(settings) {
   const complete = completeSettings(settings);
   for (const [key, field] of Object.entries(fields)) {
     if (field.type === "checkbox") field.checked = complete[key] === true;
-    else if (key !== "security_log_channel_id") field.value = String(complete[key] ?? "");
+    else if (!["security_log_channel_id", "verification_channel_id", "verification_role_id"].includes(key)) field.value = String(complete[key] ?? "");
   }
   logChannel.value = complete.security_log_channel_id || "";
+  verificationChannel.value = complete.verification_channel_id || "";
+  verificationRole.value = complete.verification_role_id || "";
 }
 
 function settingsFromForm() {
   const values = {};
   for (const [key, field] of Object.entries(fields)) {
     if (field.type === "checkbox") values[key] = field.checked;
-    else if (key === "security_log_channel_id") values[key] = field.value || null;
+    else if (["security_log_channel_id", "verification_channel_id", "verification_role_id"].includes(key)) values[key] = field.value || null;
     else values[key] = Number(field.value);
   }
   return values;
@@ -190,6 +213,7 @@ function updateOverview(settings, lastSyncAt = latestLastSyncAt) {
   setPill("#overview-antispam", "Anti-spam", complete.antispam_enabled);
   setPill("#overview-lockdown", "Lockdown", complete.auto_lockdown_enabled);
   setPill("#overview-logs", "Journaux", Boolean(complete.security_log_channel_id));
+  setPill("#overview-verification", "Vérification", complete.verification_enabled);
   renderSync(lastSyncAt);
 }
 
@@ -202,7 +226,12 @@ function selectPreset(name = "") {
 function applyPreset(name, message) {
   const preset = PRESETS[name];
   if (!preset) return;
-  const settings = { ...preset, security_log_channel_id: logChannel.value || null };
+  const settings = {
+    ...preset,
+    security_log_channel_id: logChannel.value || null,
+    verification_channel_id: verificationChannel.value || null,
+    verification_role_id: verificationRole.value || null,
+  };
   fillSettings(settings);
   updateOverview(settings);
   selectPreset(name);
@@ -214,13 +243,16 @@ async function loadGuild() {
   if (!guildId) return;
   setStatus("Chargement des réglages…");
   try {
-    const [settingsData, channelsData] = await Promise.all([
+    const [settingsData, channelsData, rolesData] = await Promise.all([
       request(`/api/dashboard-settings?guild=${encodeURIComponent(guildId)}`),
       request(`/api/dashboard-channels?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ channels: [], error })),
+      request(`/api/dashboard-roles?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ roles: [], error })),
     ]);
     loadedSettings = completeSettings(settingsData.settings);
     latestLastSyncAt = settingsData.last_sync_at || null;
     populateChannels(channelsData.channels, loadedSettings.security_log_channel_id);
+    populateVerificationChannels(channelsData.channels, loadedSettings.verification_channel_id);
+    populateRoles(rolesData.roles, loadedSettings.verification_role_id);
     fillSettings(loadedSettings);
     updateOverview(loadedSettings, latestLastSyncAt);
     selectPreset("");
@@ -230,6 +262,13 @@ async function loadGuild() {
       channelNote.textContent = channelsData.channels.length
         ? "Choisis le salon où Sentinel.exe enverra ses journaux de sécurité."
         : "Aucun salon textuel visible par le bot.";
+    }
+    if (rolesData.error) {
+      verificationNote.textContent = "Les rôles ne peuvent pas être chargés pour le moment. Vérifie que Sentinel.exe est présent sur ce serveur.";
+    } else if (!rolesData.roles.length) {
+      verificationNote.textContent = "Aucun rôle attribuable n’a été trouvé. Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis recharge cette page.";
+    } else {
+      verificationNote.textContent = "Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis choisis-le ici. Pour rendre ce passage obligatoire, règle ensuite les permissions de tes salons dans Discord.";
     }
     setStatus("Réglages chargés.");
   } catch (error) {
@@ -305,10 +344,15 @@ form.addEventListener("submit", async (event) => {
     setStatus("Le seuil critique doit être supérieur au seuil d’alerte.", "error");
     return;
   }
+  if (settings.verification_enabled && (!settings.verification_channel_id || !settings.verification_role_id)) {
+    setStatus("Choisis un salon et un rôle avant d’activer la vérification.", "error");
+    return;
+  }
   const disabledProtections = [];
   if (loadedSettings.antiraid_enabled && !settings.antiraid_enabled) disabledProtections.push("l’anti-raid");
   if (loadedSettings.antispam_enabled && !settings.antispam_enabled) disabledProtections.push("l’anti-spam");
   if (loadedSettings.auto_lockdown_enabled && !settings.auto_lockdown_enabled) disabledProtections.push("le lockdown automatique");
+  if (loadedSettings.verification_enabled && !settings.verification_enabled) disabledProtections.push("la vérification des membres");
   if (disabledProtections.length && !window.confirm(`Tu vas désactiver ${disabledProtections.join(", ")}. Ton serveur sera moins protégé. Continuer ?`)) return;
 
   saveButton.disabled = true;

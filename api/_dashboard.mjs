@@ -21,6 +21,9 @@ export const DEFAULT_SETTINGS = Object.freeze({
   spam_duplicate_limit: 3,
   spam_mention_limit: 5,
   spam_timeout_minutes: 10,
+  verification_enabled: false,
+  verification_channel_id: null,
+  verification_role_id: null,
 });
 
 export function json(body, status = 200) {
@@ -134,7 +137,14 @@ export function validateSettings(input) {
   if (channelId !== null && (typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId))) {
     throw new Error("Le salon de journaux est invalide.");
   }
-  for (const field of ["antiraid_enabled", "auto_lockdown_enabled", "critical_quarantine_all", "antispam_enabled"]) {
+  const verificationChannelId = input.verification_channel_id;
+  const verificationRoleId = input.verification_role_id;
+  for (const [value, label] of [[verificationChannelId, "Le salon de vérification"], [verificationRoleId, "Le rôle de vérification"]]) {
+    if (value !== null && (typeof value !== "string" || !/^\d{17,20}$/.test(value))) {
+      throw new Error(`${label} est invalide.`);
+    }
+  }
+  for (const field of ["antiraid_enabled", "auto_lockdown_enabled", "critical_quarantine_all", "antispam_enabled", "verification_enabled"]) {
     if (typeof input[field] !== "boolean") throw new Error(`${field} est invalide.`);
   }
   const settings = {
@@ -153,9 +163,15 @@ export function validateSettings(input) {
     spam_duplicate_limit: requireInteger(input.spam_duplicate_limit, "La limite de doublons", 2, 20),
     spam_mention_limit: requireInteger(input.spam_mention_limit, "La limite de mentions", 1, 50),
     spam_timeout_minutes: requireInteger(input.spam_timeout_minutes, "Le timeout", 1, 10080),
+    verification_enabled: input.verification_enabled,
+    verification_channel_id: verificationChannelId,
+    verification_role_id: verificationRoleId,
   };
   if (settings.raid_critical_joins <= settings.raid_warning_joins) {
     throw new Error("Le seuil critique doit être supérieur au seuil d’alerte.");
+  }
+  if (settings.verification_enabled && (!settings.verification_channel_id || !settings.verification_role_id)) {
+    throw new Error("Choisis un salon et un rôle avant d’activer la vérification.");
   }
   return settings;
 }

@@ -58,6 +58,7 @@
               <span class="status-pill" id="overview-antispam">Anti-spam</span>
               <span class="status-pill" id="overview-lockdown">Lockdown</span>
               <span class="status-pill" id="overview-logs">Journaux</span>
+              <span class="status-pill" id="overview-verification">Vérification</span>
             </div>
             <div class="sync-card" aria-live="polite">
               <span class="sync-dot" id="sync-dot" aria-hidden="true"></span>
@@ -94,6 +95,20 @@
                 <select id="log-channel"><option value="">Aucun salon sélectionné</option></select>
               </label>
               <p class="field-note" id="channel-note">Les salons visibles par le bot apparaîtront ici.</p>
+            </section>
+
+            <section class="settings-card verification-card">
+              <div class="card-heading"><div><p class="card-kicker">ACCÈS MEMBRES</p><h2>Vérification à l’arrivée</h2><p>Le bot publie un bouton dans un salon et attribue le rôle choisi après le clic.</p></div></div>
+              <label class="toggle-row verification-toggle"><span><strong>Activer la vérification</strong><small>Le panneau est créé ou actualisé par le bot en moins d’une minute.</small></span><input id="verification-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+              <div class="input-grid verification-inputs">
+                <label class="field-label" for="verification-channel">Salon de vérification
+                  <select id="verification-channel"><option value="">Choisir un salon</option></select>
+                </label>
+                <label class="field-label" for="verification-role">Rôle attribué après vérification
+                  <select id="verification-role"><option value="">Choisir un rôle</option></select>
+                </label>
+              </div>
+              <p class="verification-help" id="verification-note">Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis choisis-le ici. Pour rendre ce passage obligatoire, règle ensuite les permissions de tes salons dans Discord.</p>
             </section>
 
             <section class="settings-card">
