@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Guide de démarrage de Sentinel.exe pour protéger un serveur Discord." />
+    <meta name="theme-color" content="#07111f" />
+    <title>Guide de démarrage | Sentinel.exe</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header legal-header">
+      <div class="shell navigation">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">◆</span>SENTINEL.EXE</a>
+        <nav aria-label="Navigation principale">
+          <a href="/">Accueil</a>
+          <a href="/panel">Espace admin</a>
+          <a href="/conditions">Conditions</a>
+        </nav>
+        <a class="nav-action" href="/panel">Espace admin</a>
+      </div>
+    </header>
+
+    <main class="guide-main">
+      <div class="shell">
+        <section class="guide-intro">
+          <p class="eyebrow dark"><span></span> Guide de démarrage</p>
+          <h1>Configurer Sentinel.exe sans se compliquer la vie.</h1>
+          <p>Voici un ordre simple pour installer les protections, vérifier qu’elles fonctionnent et garder la main sur ton serveur Discord.</p>
+        </section>
+
+        <div class="guide-layout">
+          <article class="guide-content">
+            <section class="guide-card highlight">
+              <p class="number">01</p>
+              <h2>Préparer le serveur</h2>
+              <p>Avant de régler les protections, assure-toi que Sentinel.exe peut agir correctement sur ton serveur.</p>
+              <ul>
+                <li>Invite le bot avec les permissions nécessaires à la modération et à l’envoi de messages.</li>
+                <li>Place le rôle de Sentinel.exe <strong>au-dessus</strong> des rôles que le bot doit attribuer, retirer ou modérer.</li>
+                <li>Crée un salon réservé aux <strong>journaux de sécurité</strong> afin que l’équipe voie les actions importantes.</li>
+              </ul>
+            </section>
+
+            <section class="guide-card">
+              <p class="number">02</p>
+              <h2>Choisir les réglages de base</h2>
+              <p>Ouvre la configuration de Sentinel.exe depuis Discord, ou utilise l’<a href="/panel">espace admin</a> si tu préfères régler ton serveur sur le site.</p>
+              <ol>
+                <li>Sélectionne le salon qui recevra les logs de sécurité.</li>
+                <li>Active l’anti-raid et l’anti-spam.</li>
+                <li>Commence avec des seuils équilibrés, puis adapte-les à l’activité réelle de ta communauté.</li>
+                <li>Enregistre les réglages et attends la confirmation du bot.</li>
+              </ol>
+            </section>
+
+            <section class="guide-card">
+              <p class="number">03</p>
+              <h2>Régler l’anti-raid et l’anti-spam</h2>
+              <p>Le bon niveau dépend de ton serveur. Un petit serveur calme peut utiliser des seuils plus bas ; une communauté active aura besoin de seuils plus hauts pour éviter les faux positifs.</p>
+              <ul>
+                <li><strong>Anti-raid :</strong> définis le nombre d’arrivées anormales qui doit déclencher une alerte, puis un niveau critique.</li>
+                <li><strong>Anti-spam :</strong> règle le nombre de messages, doublons et mentions tolérés sur une courte période.</li>
+                <li><strong>Quarantaine :</strong> utilise-la pour isoler temporairement les comptes jugés à risque, sans les bannir trop vite.</li>
+              </ul>
+            </section>
+
+            <section class="guide-card">
+              <p class="number">04</p>
+              <h2>Faire un test sans risque</h2>
+              <p>Teste toujours avec un compte de confiance, dans un salon de test si possible. Vérifie que les journaux remontent bien et que Sentinel.exe possède les permissions attendues.</p>
+              <div class="guide-callout"><strong>Conseil :</strong> évite de simuler un raid réel ou de spammer le serveur pour tester. Ajuste les seuils petit à petit, puis contrôle les logs.</div>
+            </section>
+
+            <section class="guide-card">
+              <p class="number">05</p>
+              <h2>Réagir pendant un incident</h2>
+              <p>En cas de raid ou de flood, utilise le verrouillage prévu par Sentinel.exe pour limiter rapidement l’accès aux salons, puis consulte les journaux. Une fois la situation calme, rétablis progressivement l’accès et ajuste les seuils qui ont laissé passer l’incident.</p>
+            </section>
+          </article>
+
+          <aside class="guide-aside" aria-label="Informations utiles">
+            <section class="guide-aside-card">
+              <p class="number">À SAVOIR</p>
+              <h2>Un serveur, ses réglages.</h2>
+              <ul>
+                <li>Les paramètres ne modifient que le serveur sélectionné.</li>
+                <li>L’espace admin n’affiche que les serveurs que tu administres.</li>
+                <li>Sentinel.exe ne demande jamais ton mot de passe Discord.</li>
+              </ul>
+            </section>
+            <section class="guide-aside-card">
+              <p class="number">RÉGLAGES EN LIGNE</p>
+              <h2>Besoin de plus de confort ?</h2>
+              <p>Utilise l’espace admin pour ajuster les protections depuis le site, puis laisse le bot confirmer la synchronisation.</p>
+              <a class="button-primary" href="/panel">Ouvrir l’espace admin <span aria-hidden="true">→</span></a>
+            </section>
+            <section class="guide-aside-card">
+              <p class="number">SUPPORT</p>
+              <h2>Une question ?</h2>
+              <p>Décris ton besoin à l’équipe depuis le formulaire de support.</p>
+              <a class="text-link" href="/#support">Contacter l’équipe <span aria-hidden="true">→</span></a>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="shell footer-content">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">◆</span>SENTINEL.EXE</a>
+        <p>Protection anti-raid et modération pour Discord.</p>
+        <a href="/panel">Espace admin</a>
+        <a href="/conditions">Conditions d’utilisation</a>
+        <span>© 2026 Sentinel.exe</span>
+      </div>
+    </footer>
+  </body>
+</html>
