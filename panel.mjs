@@ -19,6 +19,11 @@ const syncDot = document.querySelector("#sync-dot");
 const syncLabel = document.querySelector("#sync-label");
 const syncDetails = document.querySelector("#sync-details");
 const presetButtons = [...document.querySelectorAll("[data-preset]")];
+const ticketPanelsElement = document.querySelector("#ticket-panels");
+const ticketEmpty = document.querySelector("#ticket-empty");
+const addTicketPanelButton = document.querySelector("#add-ticket-panel");
+const saveTicketsButton = document.querySelector("#save-tickets");
+const ticketStatus = document.querySelector("#ticket-status");
 
 const DEFAULT_SETTINGS = Object.freeze({
   security_log_channel_id: null,
@@ -73,6 +78,10 @@ const PRESETS = Object.freeze({
 
 let loadedSettings = { ...DEFAULT_SETTINGS };
 let latestLastSyncAt = null;
+let ticketPanels = [];
+let ticketChannels = [];
+let ticketCategories = [];
+let ticketRoles = [];
 
 const fields = {
   antiraid_enabled: document.querySelector("#antiraid-enabled"),
@@ -238,21 +247,246 @@ function applyPreset(name, message) {
   setStatus(message, "success");
 }
 
+function setTicketStatus(message = "", type = "") {
+  ticketStatus.className = `ticket-status ${type}`;
+  ticketStatus.textContent = message;
+}
+
+function newTicketId(prefix) {
+  const value = typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID().replaceAll("-", "")
+    : `${Date.now()}${Math.random().toString(16).slice(2)}`;
+  return `${prefix}_${value.slice(0, 20)}`;
+}
+
+function newTicketType() {
+  return {
+    id: newTicketId("t"),
+    name: "Assistance",
+    button_label: "Ouvrir un ticket",
+    emoji: "🎫",
+    button_style: "primary",
+    staff_role_id: "",
+    category_id: "",
+    opening_message: "Bonjour ! Décris ta demande avec le plus de détails possible. L’équipe te répondra dès que possible.",
+    questions: [],
+  };
+}
+
+function newTicketPanel() {
+  return {
+    id: newTicketId("p"),
+    channel_id: "",
+    title: "Besoin d’aide ?",
+    description: "Choisis la catégorie qui correspond à ta demande. Un salon privé sera créé pour échanger avec l’équipe.",
+    colour: "#5865F2",
+    footer: "Sentinel.exe • Support privé",
+    types: [newTicketType()],
+  };
+}
+
+function newTicketQuestion() {
+  return { label: "Ta demande", placeholder: "Décris ta demande…", required: true, style: "paragraph" };
+}
+
+function element(tag, className = "", text = "") {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text) node.textContent = text;
+  return node;
+}
+
+function createInput(label, value, dataset, { textarea = false, type = "text", maxLength = 0 } = {}) {
+  const container = element("label");
+  container.textContent = label;
+  const control = document.createElement(textarea ? "textarea" : "input");
+  if (textarea) control.className = "ticket-textarea";
+  if (!textarea) control.type = type;
+  control.value = value || "";
+  if (maxLength) control.maxLength = maxLength;
+  Object.assign(control.dataset, dataset);
+  container.append(control);
+  return container;
+}
+
+function createSelect(label, selected, choices, dataset, emptyLabel) {
+  const container = element("label");
+  container.textContent = label;
+  const control = document.createElement("select");
+  Object.assign(control.dataset, dataset);
+  const empty = new Option(emptyLabel, "");
+  control.add(empty);
+  for (const choice of choices) control.add(new Option(choice.label, choice.id));
+  if (selected && !choices.some((choice) => choice.id === selected)) {
+    control.add(new Option("Élément enregistré (inaccessible)", selected));
+  }
+  control.value = selected || "";
+  container.append(control);
+  return container;
+}
+
+function createButton(label, className, action, panelIndex, typeIndex = null, questionIndex = null) {
+  const button = element("button", className, label);
+  button.type = "button";
+  button.dataset.ticketAction = action;
+  button.dataset.panelIndex = String(panelIndex);
+  if (typeIndex !== null) button.dataset.typeIndex = String(typeIndex);
+  if (questionIndex !== null) button.dataset.questionIndex = String(questionIndex);
+  return button;
+}
+
+function ticketDataset(panelIndex, typeIndex = null, questionIndex = null, field = "") {
+  const dataset = { ticketField: field, panelIndex: String(panelIndex) };
+  if (typeIndex !== null) dataset.typeIndex = String(typeIndex);
+  if (questionIndex !== null) dataset.questionIndex = String(questionIndex);
+  return dataset;
+}
+
+function ticketTextChoices(items, prefix = "") {
+  return items.map((item) => ({ id: item.id, label: `${prefix}${item.name}` }));
+}
+
+function renderTicketQuestion(question, panelIndex, typeIndex, questionIndex) {
+  const row = element("div", "ticket-question");
+  row.append(
+    createInput("Question", question.label, ticketDataset(panelIndex, typeIndex, questionIndex, "label"), { maxLength: 45 }),
+    createInput("Exemple de réponse", question.placeholder, ticketDataset(panelIndex, typeIndex, questionIndex, "placeholder"), { maxLength: 100 }),
+    createSelect("Format", question.style, [
+      { id: "short", label: "Réponse courte" },
+      { id: "paragraph", label: "Paragraphe" },
+    ], ticketDataset(panelIndex, typeIndex, questionIndex, "style"), "Choisir")
+  );
+  const options = element("div", "ticket-question-options");
+  const required = element("label", "ticket-checkbox");
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = question.required === true;
+  Object.assign(checkbox.dataset, ticketDataset(panelIndex, typeIndex, questionIndex, "required"));
+  required.append(checkbox, document.createTextNode("Obligatoire"));
+  options.append(required);
+  row.append(options, createButton("Supprimer", "button-danger", "remove-question", panelIndex, typeIndex, questionIndex));
+  return row;
+}
+
+function renderTicketType(ticketType, panelIndex, typeIndex) {
+  const card = element("div", "ticket-type");
+  const top = element("div", "ticket-type-top");
+  top.append(element("strong", "", `Type de ticket ${typeIndex + 1}`), createButton("Supprimer le type", "button-danger", "remove-type", panelIndex, typeIndex));
+  const fields = element("div", "ticket-type-grid");
+  fields.append(
+    createInput("Nom interne", ticketType.name, ticketDataset(panelIndex, typeIndex, null, "name"), { maxLength: 80 }),
+    createInput("Emoji", ticketType.emoji, ticketDataset(panelIndex, typeIndex, null, "emoji"), { maxLength: 80 }),
+    createInput("Texte du bouton", ticketType.button_label, ticketDataset(panelIndex, typeIndex, null, "button_label"), { maxLength: 80 }),
+    createSelect("Couleur", ticketType.button_style, [
+      { id: "primary", label: "Bleu" },
+      { id: "secondary", label: "Gris" },
+      { id: "success", label: "Vert" },
+      { id: "danger", label: "Rouge" },
+    ], ticketDataset(panelIndex, typeIndex, null, "button_style"), "Choisir")
+  );
+  const permissions = element("div", "ticket-type-grid-secondary");
+  permissions.append(
+    createSelect("Rôle qui répondra", ticketType.staff_role_id, ticketTextChoices(ticketRoles, "@"), ticketDataset(panelIndex, typeIndex, null, "staff_role_id"), "Choisir un rôle"),
+    createSelect("Catégorie où créer le ticket", ticketType.category_id, ticketTextChoices(ticketCategories, "#"), ticketDataset(panelIndex, typeIndex, null, "category_id"), "Choisir une catégorie")
+  );
+  const opening = createInput("Message d’ouverture", ticketType.opening_message, ticketDataset(panelIndex, typeIndex, null, "opening_message"), { textarea: true, maxLength: 3500 });
+  const questionHeading = element("div", "ticket-question-heading");
+  questionHeading.append(element("strong", "", `Questions avant l’ouverture (${ticketType.questions.length}/5)`));
+  const addQuestion = createButton("+ Ajouter une question", "button-small", "add-question", panelIndex, typeIndex);
+  addQuestion.disabled = ticketType.questions.length >= 5;
+  questionHeading.append(addQuestion);
+  const questions = element("div", "ticket-question-list");
+  ticketType.questions.forEach((question, questionIndex) => questions.append(renderTicketQuestion(question, panelIndex, typeIndex, questionIndex)));
+  card.append(top, fields, permissions, opening, questionHeading, questions);
+  return card;
+}
+
+function renderTicketPanels() {
+  ticketPanelsElement.replaceChildren();
+  ticketEmpty.classList.toggle("hidden", ticketPanels.length > 0);
+  ticketPanels.forEach((panel, panelIndex) => {
+    const card = element("article", "ticket-panel");
+    const top = element("div", "ticket-panel-top");
+    const label = element("div");
+    label.append(element("strong", "", `Panneau ${panelIndex + 1}`), element("span", "", "Le bot le publiera après la synchronisation."));
+    top.append(label, createButton("Supprimer le panneau", "button-danger", "remove-panel", panelIndex));
+    const body = element("div", "ticket-panel-body");
+    const fields = element("div", "ticket-panel-fields");
+    fields.append(
+      createSelect("Salon du panneau", panel.channel_id, ticketTextChoices(ticketChannels, "#"), ticketDataset(panelIndex, null, null, "channel_id"), "Choisir un salon"),
+      createInput("Titre", panel.title, ticketDataset(panelIndex, null, null, "title"), { maxLength: 256 }),
+      createInput("Couleur de l’embed", panel.colour, ticketDataset(panelIndex, null, null, "colour"), { type: "color" }),
+      createInput("Pied de page", panel.footer, ticketDataset(panelIndex, null, null, "footer"), { maxLength: 2048 })
+    );
+    const description = createInput("Description du panneau", panel.description, ticketDataset(panelIndex, null, null, "description"), { textarea: true, maxLength: 4096 });
+    description.classList.add("ticket-panel-description");
+    const typesHeading = element("div", "ticket-types-heading");
+    typesHeading.append(element("strong", "", `Boutons et types (${panel.types.length}/5)`));
+    const addType = createButton("+ Ajouter un type", "button-small", "add-type", panelIndex);
+    addType.disabled = panel.types.length >= 5;
+    typesHeading.append(addType);
+    const types = element("div", "ticket-types");
+    panel.types.forEach((ticketType, typeIndex) => types.append(renderTicketType(ticketType, panelIndex, typeIndex)));
+    body.append(fields, description, typesHeading, types);
+    card.append(top, body);
+    ticketPanelsElement.append(card);
+  });
+}
+
+function ticketLocation(target) {
+  const panel = ticketPanels[Number(target.dataset.panelIndex)];
+  if (!panel) return {};
+  const type = target.dataset.typeIndex === undefined ? null : panel.types[Number(target.dataset.typeIndex)];
+  const question = type && target.dataset.questionIndex !== undefined ? type.questions[Number(target.dataset.questionIndex)] : null;
+  return { panel, type, question };
+}
+
+function updateTicketField(target) {
+  const { panel, type, question } = ticketLocation(target);
+  const destination = question || type || panel;
+  const field = target.dataset.ticketField;
+  if (!destination || !field) return;
+  destination[field] = target.type === "checkbox" ? target.checked : target.value;
+}
+
+function validateTicketsInBrowser() {
+  for (const panel of ticketPanels) {
+    if (!panel.channel_id || !panel.title.trim() || !panel.description.trim()) return "Complète le salon, le titre et la description de chaque panneau.";
+    if (!/^#[0-9a-fA-F]{6}$/.test(panel.colour || "")) return "Choisis une couleur valide pour chaque panneau.";
+    if (!Array.isArray(panel.types) || panel.types.length === 0) return "Chaque panneau doit avoir au moins un type de ticket.";
+    for (const ticketType of panel.types) {
+      if (!ticketType.name.trim() || !ticketType.button_label.trim() || !ticketType.emoji.trim()) return "Complète le nom, l’emoji et le bouton de chaque type.";
+      if (!ticketType.staff_role_id || !ticketType.category_id) return "Choisis un rôle d’équipe et une catégorie pour chaque type.";
+      if (!ticketType.opening_message.trim()) return "Ajoute le message d’ouverture de chaque type.";
+      for (const question of ticketType.questions) {
+        if (!question.label.trim() || !question.placeholder.trim()) return "Complète ou retire les questions incomplètes.";
+      }
+    }
+  }
+  return "";
+}
+
 async function loadGuild() {
   const guildId = selectedGuildId();
   if (!guildId) return;
   setStatus("Chargement des réglages…");
   try {
-    const [settingsData, channelsData, rolesData] = await Promise.all([
+    const [settingsData, channelsData, rolesData, ticketsData] = await Promise.all([
       request(`/api/dashboard-settings?guild=${encodeURIComponent(guildId)}`),
-      request(`/api/dashboard-channels?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ channels: [], error })),
+      request(`/api/dashboard-channels?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ channels: [], categories: [], error })),
       request(`/api/dashboard-roles?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ roles: [], error })),
+      request(`/api/dashboard-tickets?guild=${encodeURIComponent(guildId)}`).catch((error) => ({ settings: { panels: [] }, error })),
     ]);
     loadedSettings = completeSettings(settingsData.settings);
     latestLastSyncAt = settingsData.last_sync_at || null;
     populateChannels(channelsData.channels, loadedSettings.security_log_channel_id);
     populateVerificationChannels(channelsData.channels, loadedSettings.verification_channel_id);
     populateRoles(rolesData.roles, loadedSettings.verification_role_id);
+    ticketChannels = Array.isArray(channelsData.channels) ? channelsData.channels : [];
+    ticketCategories = Array.isArray(channelsData.categories) ? channelsData.categories : [];
+    ticketRoles = Array.isArray(rolesData.roles) ? rolesData.roles : [];
+    ticketPanels = Array.isArray(ticketsData.settings?.panels) ? ticketsData.settings.panels : [];
+    renderTicketPanels();
     fillSettings(loadedSettings);
     updateOverview(loadedSettings, latestLastSyncAt);
     selectPreset("");
@@ -269,6 +503,13 @@ async function loadGuild() {
       verificationNote.textContent = "Aucun rôle attribuable n’a été trouvé. Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis recharge cette page.";
     } else {
       verificationNote.textContent = "Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis choisis-le ici. Pour rendre ce passage obligatoire, règle ensuite les permissions de tes salons dans Discord.";
+    }
+    if (ticketsData.error) {
+      setTicketStatus("Le module de tickets n’est pas encore disponible. Vérifie que la mise à jour du site et la migration Supabase sont bien en place.", "error");
+    } else if (ticketPanels.length) {
+      setTicketStatus("Configuration des tickets chargée. Enregistre après tes modifications : le bot publiera ou actualisera les panneaux en moins d’une minute.");
+    } else {
+      setTicketStatus("Crée ton premier panneau de tickets pour commencer.");
     }
     setStatus("Réglages chargés.");
   } catch (error) {
@@ -329,6 +570,96 @@ presetButtons.forEach((button) => {
 
 resetButton.addEventListener("click", () => {
   applyPreset("balanced", "Réglages équilibrés restaurés. Enregistre pour confirmer ce choix.");
+});
+
+addTicketPanelButton.addEventListener("click", () => {
+  if (ticketPanels.length >= 10) {
+    setTicketStatus("Tu peux créer jusqu’à 10 panneaux de tickets.", "error");
+    return;
+  }
+  ticketPanels.push(newTicketPanel());
+  renderTicketPanels();
+  setTicketStatus("Nouveau panneau créé. Complète ses réglages, puis enregistre.", "success");
+});
+
+ticketPanelsElement.addEventListener("input", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
+  if (!target.dataset.ticketField) return;
+  updateTicketField(target);
+});
+
+ticketPanelsElement.addEventListener("change", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
+  if (!target.dataset.ticketField) return;
+  updateTicketField(target);
+});
+
+ticketPanelsElement.addEventListener("click", (event) => {
+  const target = event.target instanceof Element ? event.target.closest("button[data-ticket-action]") : null;
+  if (!target) return;
+  const panelIndex = Number(target.dataset.panelIndex);
+  const panel = ticketPanels[panelIndex];
+  if (!panel) return;
+  const typeIndex = target.dataset.typeIndex === undefined ? -1 : Number(target.dataset.typeIndex);
+  const ticketType = typeIndex >= 0 ? panel.types[typeIndex] : null;
+  const questionIndex = target.dataset.questionIndex === undefined ? -1 : Number(target.dataset.questionIndex);
+
+  switch (target.dataset.ticketAction) {
+    case "remove-panel":
+      if (!window.confirm("Supprimer ce panneau ? Le bot retirera aussi le message Discord publié lors de sa prochaine synchronisation.")) return;
+      ticketPanels.splice(panelIndex, 1);
+      break;
+    case "add-type":
+      if (panel.types.length >= 5) return;
+      panel.types.push(newTicketType());
+      break;
+    case "remove-type":
+      if (!ticketType || panel.types.length <= 1) {
+        setTicketStatus("Un panneau doit toujours garder au moins un type de ticket.", "error");
+        return;
+      }
+      panel.types.splice(typeIndex, 1);
+      break;
+    case "add-question":
+      if (!ticketType || ticketType.questions.length >= 5) return;
+      ticketType.questions.push(newTicketQuestion());
+      break;
+    case "remove-question":
+      if (!ticketType || questionIndex < 0) return;
+      ticketType.questions.splice(questionIndex, 1);
+      break;
+    default:
+      return;
+  }
+  renderTicketPanels();
+  setTicketStatus("Modification en attente. Enregistre pour l’envoyer au bot.");
+});
+
+saveTicketsButton.addEventListener("click", async () => {
+  const error = validateTicketsInBrowser();
+  if (error) {
+    setTicketStatus(error, "error");
+    return;
+  }
+  if (!ticketPanels.length && !window.confirm("Cela supprimera tous les panneaux de tickets publiés par Sentinel.exe. Continuer ?")) return;
+  saveTicketsButton.disabled = true;
+  setTicketStatus("Enregistrement de la configuration des tickets…");
+  try {
+    const data = await request(`/api/dashboard-tickets?guild=${encodeURIComponent(selectedGuildId())}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ panels: ticketPanels }),
+    });
+    ticketPanels = Array.isArray(data.settings?.panels) ? data.settings.panels : [];
+    renderTicketPanels();
+    setTicketStatus("Tickets enregistrés. Sentinel.exe publiera ou actualisera les panneaux en moins d’une minute.", "success");
+  } catch (requestError) {
+    setTicketStatus(requestError.message || "Impossible d’enregistrer les tickets.", "error");
+  } finally {
+    saveTicketsButton.disabled = false;
+  }
 });
 
 form.addEventListener("change", () => {

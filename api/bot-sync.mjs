@@ -10,15 +10,16 @@ export default {
       return json({ ok: false, message: "Non autorisé." }, 401);
     }
     try {
-      const [settings] = await Promise.all([
+      const [settings, ticket_settings] = await Promise.all([
         (await supabase("dashboard_guild_settings?select=*&order=updated_at.asc")).json(),
+        (await supabase("dashboard_ticket_settings?select=*&order=updated_at.asc")).json(),
         supabase("dashboard_sync_status?on_conflict=id", {
           method: "POST",
           headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
           body: JSON.stringify({ id: 1, last_sync_at: new Date().toISOString() }),
         }).catch((error) => console.warn("Dashboard sync status is unavailable", error)),
       ]);
-      return json({ ok: true, settings });
+      return json({ ok: true, settings, ticket_settings });
     } catch (error) {
       console.error("Unable to provide bot dashboard settings", error);
       return json({ ok: false, message: "Synchronisation indisponible." }, 503);

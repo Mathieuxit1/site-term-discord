@@ -76,6 +76,50 @@
 .risk-inputs { max-width: 460px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .save-bar { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 23px 25px; border-radius: 8px; color: #dce6f3; background: #112944; }
 .save-bar p { margin: 0; font-size: 14px; }
+.ticket-manager { background: linear-gradient(145deg, #fff, #fbfcfe); }
+.ticket-heading { margin-bottom: 18px; }
+.ticket-notice { display: flex; gap: 11px; margin: 0 0 18px; padding: 12px 14px; border-left: 3px solid #d89b20; color: #5c6c80; background: #fff8e7; font-size: 12px; line-height: 1.45; }
+.ticket-notice strong { flex: 0 0 auto; color: #805400; }
+.ticket-panels { display: grid; gap: 16px; }
+.ticket-empty { display: grid; gap: 5px; padding: 27px; border: 1px dashed #b9c4d0; border-radius: 7px; color: #64748a; text-align: center; background: #f9fafb; }
+.ticket-empty strong { color: #35435a; }
+.ticket-empty span { font-size: 13px; }
+.ticket-panel { overflow: hidden; border: 1px solid #d5dce5; border-radius: 8px; background: #fff; }
+.ticket-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 14px 17px; border-bottom: 1px solid #e3e8ee; background: #f5f7fa; }
+.ticket-panel-top strong { color: #26384f; font-size: 15px; }
+.ticket-panel-top span { margin-left: 7px; color: #738197; font-size: 12px; }
+.ticket-panel-body { display: grid; gap: 17px; padding: 18px; }
+.ticket-panel-fields { display: grid; grid-template-columns: 1.1fr 1.3fr .8fr; gap: 12px; align-items: end; }
+.ticket-textarea { min-height: 92px; resize: vertical; }
+.ticket-panel-description { display: grid; gap: 7px; color: #35435a; font-size: 13px; font-weight: 800; }
+.ticket-panel-description textarea, .ticket-type textarea, .ticket-question input, .ticket-type input, .ticket-type select, .ticket-panel-fields input, .ticket-panel-fields select { width: 100%; min-height: 43px; border: 1px solid #c9d1dc; border-radius: 5px; padding: 9px 10px; color: #203147; background: #fff; font: inherit; }
+.ticket-panel-description textarea:focus, .ticket-type textarea:focus, .ticket-question input:focus, .ticket-type input:focus, .ticket-type select:focus, .ticket-panel-fields input:focus, .ticket-panel-fields select:focus { outline: 3px solid #f4b94255; border-color: #a46b05; }
+.ticket-types { display: grid; gap: 11px; }
+.ticket-types-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ticket-types-heading strong { color: #35435a; font-size: 14px; }
+.ticket-type { display: grid; gap: 14px; padding: 16px; border: 1px solid #e0e6ed; border-radius: 7px; background: #fbfcfd; }
+.ticket-type-top { display: flex; align-items: center; justify-content: space-between; gap: 13px; }
+.ticket-type-top strong { color: #304158; font-size: 14px; }
+.ticket-type-grid { display: grid; grid-template-columns: 1fr .5fr 1.2fr 1fr; gap: 11px; }
+.ticket-type-grid-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.ticket-type label, .ticket-question label { display: grid; gap: 6px; color: #47576c; font-size: 12px; font-weight: 800; }
+.ticket-question-list { display: grid; gap: 9px; }
+.ticket-question-heading { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
+.ticket-question-heading strong { color: #47576c; font-size: 12px; }
+.ticket-question { display: grid; grid-template-columns: 1fr 1.25fr 130px auto; gap: 9px; align-items: end; padding: 11px; border: 1px solid #e3e8ee; border-radius: 6px; background: #fff; }
+.ticket-question-options { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-height: 43px; }
+.ticket-checkbox { display: inline-flex !important; grid-auto-flow: column; gap: 5px !important; align-items: center; color: #607086 !important; font-size: 11px !important; white-space: nowrap; }
+.ticket-checkbox input { width: 15px; min-height: 15px; margin: 0; accent-color: #b47a11; }
+.ticket-actions { display: flex; align-items: center; justify-content: space-between; gap: 13px; margin-top: 18px; }
+.ticket-status { min-height: 20px; margin: 11px 0 0; color: #66778e; font-size: 13px; }
+.ticket-status.error { color: #a52f2f; }
+.ticket-status.success { color: #187143; }
+.button-danger, .button-small { min-height: 35px; border-radius: 5px; padding: 7px 10px; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
+.button-danger { border: 1px solid #e8bbbb; color: #9a3131; background: #fff6f6; }
+.button-danger:hover, .button-danger:focus-visible { border-color: #bc5d5d; background: #ffeded; }
+.button-small { border: 1px solid #cfd8e2; color: #43556d; background: #fff; }
+.button-small:hover, .button-small:focus-visible { border-color: #9cacbd; background: #f5f8fb; }
+.button-danger:focus-visible, .button-small:focus-visible { outline: 3px solid #f4b94255; }
 
 @media (max-width: 1040px) {
   .server-overview { grid-template-columns: 1fr 1fr; }
@@ -87,6 +131,8 @@
   .settings-card.wide, .save-bar { grid-column: auto; }
   .toggle-grid { grid-template-columns: 1fr; }
   .compact-inputs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ticket-panel-fields, .ticket-type-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ticket-question { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 620px) {
@@ -99,6 +145,11 @@
   .card-heading { align-items: flex-start; flex-direction: column; }
   .input-grid, .compact-inputs, .risk-inputs { grid-template-columns: 1fr 1fr; }
   .verification-inputs { grid-template-columns: 1fr; }
+  .ticket-panel-fields, .ticket-type-grid, .ticket-type-grid-secondary, .ticket-question { grid-template-columns: 1fr; }
+  .ticket-actions { align-items: stretch; flex-direction: column; }
+  .ticket-actions .button-primary, .ticket-actions .button-secondary { width: 100%; }
+  .ticket-panel-top, .ticket-types-heading, .ticket-type-top, .ticket-question-heading { align-items: stretch; flex-direction: column; }
+  .ticket-panel-top .button-danger, .ticket-type-top .button-danger, .ticket-question .button-danger { width: 100%; }
   .save-bar { align-items: stretch; flex-direction: column; }
   .save-bar .button-primary, .reset-button { width: 100%; }
 }

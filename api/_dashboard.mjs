@@ -176,11 +176,11 @@ export function validateSettings(input) {
   return settings;
 }
 
-export async function readJson(request) {
+export async function readJson(request, maximumBytes = 8_000) {
   const size = Number(request.headers.get("content-length") || 0);
-  if (size > 8_000) throw new Error("La demande est trop volumineuse.");
+  if (size > maximumBytes) throw new Error("La demande est trop volumineuse.");
   const text = await request.text();
-  if (new TextEncoder().encode(text).byteLength > 8_000) throw new Error("La demande est trop volumineuse.");
+  if (new TextEncoder().encode(text).byteLength > maximumBytes) throw new Error("La demande est trop volumineuse.");
   try {
     return JSON.parse(text);
   } catch {

@@ -111,6 +111,28 @@
               <p class="verification-help" id="verification-note">Crée un rôle « Vérifié » sous le rôle de Sentinel.exe, puis choisis-le ici. Pour rendre ce passage obligatoire, règle ensuite les permissions de tes salons dans Discord.</p>
             </section>
 
+            <section class="settings-card wide ticket-manager" aria-labelledby="tickets-title">
+              <div class="card-heading ticket-heading">
+                <div>
+                  <p class="card-kicker">SUPPORT</p>
+                  <h2 id="tickets-title">Système de tickets</h2>
+                  <p>Crée des panneaux, leurs boutons et les questions posées avant l’ouverture. Sentinel.exe publie ou actualise automatiquement le panneau après la synchronisation.</p>
+                </div>
+                <span class="card-badge">V1</span>
+              </div>
+              <div class="ticket-notice"><strong>À savoir</strong><span>Discord autorise jusqu’à 5 boutons par panneau et 5 questions par formulaire. Chaque type de ticket peut avoir sa propre équipe et sa propre catégorie.</span></div>
+              <div class="ticket-panels" id="ticket-panels"></div>
+              <div class="ticket-empty" id="ticket-empty">
+                <strong>Aucun panneau de tickets pour l’instant.</strong>
+                <span>Crée le premier panneau, puis choisis son salon, ses boutons et les questions à poser.</span>
+              </div>
+              <div class="ticket-actions">
+                <button class="button-secondary" id="add-ticket-panel" type="button">+ Créer un panneau</button>
+                <button class="button-primary" id="save-tickets" type="button">Enregistrer les tickets <span aria-hidden="true">→</span></button>
+              </div>
+              <p class="ticket-status" id="ticket-status" role="status"></p>
+            </section>
+
             <section class="settings-card">
               <div class="card-heading"><div><p class="card-kicker">ARRIVÉES</p><h2>Seuils anti-raid</h2><p>Définis à partir de combien d’arrivées le bot doit réagir.</p></div></div>
               <div class="input-grid">

@@ -16,11 +16,16 @@ export default {
         headers: { Authorization: `Bot ${botToken}` },
       });
       if (!response.ok) throw new Error("Sentinel.exe ne peut pas lire les salons de ce serveur.");
-      const channels = (await response.json())
+      const guildChannels = await response.json();
+      const channels = guildChannels
         .filter((channel) => channel.type === 0 || channel.type === 5)
         .map((channel) => ({ id: String(channel.id), name: String(channel.name), type: channel.type }))
         .sort((left, right) => left.name.localeCompare(right.name, "fr"));
-      return json({ ok: true, channels });
+      const categories = guildChannels
+        .filter((channel) => channel.type === 4)
+        .map((channel) => ({ id: String(channel.id), name: String(channel.name) }))
+        .sort((left, right) => left.name.localeCompare(right.name, "fr"));
+      return json({ ok: true, channels, categories });
     } catch (error) {
       console.error("Unable to read guild channels", error);
       return json({ ok: false, message: "Impossible de charger les salons pour le moment." }, 400);
