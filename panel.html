@@ -56,6 +56,9 @@
             <div class="protection-pills" aria-label="État des protections">
               <span class="status-pill" id="overview-antiraid">Anti-raid</span>
               <span class="status-pill" id="overview-antispam">Anti-spam</span>
+              <span class="status-pill" id="overview-links">Anti-lien</span>
+              <span class="status-pill" id="overview-nuke">Anti-nuke</span>
+              <span class="status-pill" id="overview-scam">Images signalées</span>
               <span class="status-pill" id="overview-lockdown">Lockdown</span>
               <span class="status-pill" id="overview-logs">Journaux</span>
               <span class="status-pill" id="overview-verification">Vérification</span>
@@ -98,7 +101,7 @@
             </section>
 
             <section class="settings-card verification-card">
-              <div class="card-heading"><div><p class="card-kicker">ACCÈS MEMBRES</p><h2>Vérification à l’arrivée</h2><p>Le bot publie un bouton dans un salon et attribue le rôle choisi après le clic.</p></div></div>
+              <div class="card-heading"><div><p class="card-kicker">ACCÈS MEMBRES</p><h2>Vérification à l’arrivée</h2><p>Le bot publie un bouton et demande de résoudre un petit défi avant d’attribuer le rôle.</p></div></div>
               <label class="toggle-row verification-toggle"><span><strong>Activer la vérification</strong><small>Le panneau est créé ou actualisé par le bot en moins d’une minute.</small></span><input id="verification-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
               <div class="input-grid verification-inputs">
                 <label class="field-label" for="verification-channel">Salon de vérification
@@ -150,6 +153,28 @@
                 <label class="field-label">Doublons<input id="spam-duplicates" type="number" min="2" max="20" required /></label>
                 <label class="field-label">Mentions<input id="spam-mentions" type="number" min="1" max="50" required /></label>
                 <label class="field-label">Timeout (min)<input id="spam-timeout" type="number" min="1" max="10080" required /></label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="card-heading"><div><p class="card-kicker">MESSAGES</p><h2>Liens et images suspects</h2><p>Les images doivent d’abord être signalées avec /protection scam_add dans Discord.</p></div></div>
+              <div class="toggle-grid">
+                <label class="toggle-row"><span><strong>Anti-lien</strong><small>Supprime les liens bloqués.</small></span><input id="anti-link-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Invitations Discord</strong><small>Bloque les invitations vers d’autres serveurs.</small></span><input id="block-invites" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Autres liens</strong><small>Autorise uniquement les domaines ajoutés avec /protection domain_add.</small></span><input id="block-external-links" type="checkbox" /><i aria-hidden="true"></i></label>
+                <label class="toggle-row"><span><strong>Images signalées</strong><small>Supprime les images proches d’une signature enregistrée.</small></span><input id="anti-scam-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div class="card-heading"><div><p class="card-kicker">ANTI-NUKE</p><h2>Actions destructrices</h2><p>Surveille les suppressions de salons et rôles ainsi que les exclusions et bannissements massifs.</p></div></div>
+              <label class="toggle-row"><span><strong>Activer l’anti-nuke</strong><small>La réaction s’applique seulement si l’auteur est identifié dans le journal d’audit Discord.</small></span><input id="anti-nuke-enabled" type="checkbox" /><i aria-hidden="true"></i></label>
+              <div class="input-grid compact-inputs">
+                <label class="field-label">Fenêtre (s)<input id="nuke-window" type="number" min="5" max="120" required /></label>
+                <label class="field-label">Actions<input id="nuke-threshold" type="number" min="2" max="10" required /></label>
+                <label class="field-label" for="nuke-response">Réaction
+                  <select id="nuke-response"><option value="alert">Alerte</option><option value="lockdown">Lockdown</option><option value="ban">Bannir et recréer les salons</option></select>
+                </label>
               </div>
             </section>
 

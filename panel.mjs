@@ -36,6 +36,14 @@ const DEFAULT_SETTINGS = Object.freeze({
   raid_warning_joins: 5,
   raid_critical_joins: 10,
   antispam_enabled: true,
+  anti_link_enabled: false,
+  block_invites: true,
+  block_external_links: false,
+  anti_scam_enabled: false,
+  anti_nuke_enabled: false,
+  nuke_window_seconds: 30,
+  nuke_action_threshold: 3,
+  nuke_response: "alert",
   spam_window_seconds: 8,
   spam_message_limit: 6,
   spam_duplicate_limit: 3,
@@ -87,6 +95,14 @@ const fields = {
   antiraid_enabled: document.querySelector("#antiraid-enabled"),
   auto_lockdown_enabled: document.querySelector("#auto-lockdown-enabled"),
   antispam_enabled: document.querySelector("#antispam-enabled"),
+  anti_link_enabled: document.querySelector("#anti-link-enabled"),
+  block_invites: document.querySelector("#block-invites"),
+  block_external_links: document.querySelector("#block-external-links"),
+  anti_scam_enabled: document.querySelector("#anti-scam-enabled"),
+  anti_nuke_enabled: document.querySelector("#anti-nuke-enabled"),
+  nuke_window_seconds: document.querySelector("#nuke-window"),
+  nuke_action_threshold: document.querySelector("#nuke-threshold"),
+  nuke_response: document.querySelector("#nuke-response"),
   critical_quarantine_all: document.querySelector("#critical-quarantine-all"),
   security_log_channel_id: logChannel,
   verification_enabled: document.querySelector("#verification-enabled"),
@@ -173,6 +189,7 @@ function settingsFromForm() {
   for (const [key, field] of Object.entries(fields)) {
     if (field.type === "checkbox") values[key] = field.checked;
     else if (["security_log_channel_id", "verification_channel_id", "verification_role_id"].includes(key)) values[key] = field.value || null;
+    else if (key === "nuke_response") values[key] = field.value;
     else values[key] = Number(field.value);
   }
   return values;
@@ -220,6 +237,9 @@ function updateOverview(settings, lastSyncAt = latestLastSyncAt) {
   selectedGuildName.textContent = currentGuildName();
   setPill("#overview-antiraid", "Anti-raid", complete.antiraid_enabled);
   setPill("#overview-antispam", "Anti-spam", complete.antispam_enabled);
+  setPill("#overview-links", "Anti-lien", complete.anti_link_enabled);
+  setPill("#overview-nuke", "Anti-nuke", complete.anti_nuke_enabled);
+  setPill("#overview-scam", "Images signalées", complete.anti_scam_enabled);
   setPill("#overview-lockdown", "Lockdown", complete.auto_lockdown_enabled);
   setPill("#overview-logs", "Journaux", Boolean(complete.security_log_channel_id));
   setPill("#overview-verification", "Vérification", complete.verification_enabled);
@@ -679,9 +699,15 @@ form.addEventListener("submit", async (event) => {
     setStatus("Choisis un salon et un rôle avant d’activer la vérification.", "error");
     return;
   }
+  if (settings.anti_nuke_enabled && settings.nuke_response === "ban" &&
+      (!loadedSettings.anti_nuke_enabled || loadedSettings.nuke_response !== "ban") &&
+      !window.confirm("L’anti-nuke pourra bannir automatiquement un compte identifié après le seuil choisi et tenter de recréer ses salons supprimés. Activer cette réaction ?")) return;
   const disabledProtections = [];
   if (loadedSettings.antiraid_enabled && !settings.antiraid_enabled) disabledProtections.push("l’anti-raid");
   if (loadedSettings.antispam_enabled && !settings.antispam_enabled) disabledProtections.push("l’anti-spam");
+  if (loadedSettings.anti_link_enabled && !settings.anti_link_enabled) disabledProtections.push("l’anti-lien");
+  if (loadedSettings.anti_scam_enabled && !settings.anti_scam_enabled) disabledProtections.push("le filtre d’images");
+  if (loadedSettings.anti_nuke_enabled && !settings.anti_nuke_enabled) disabledProtections.push("l’anti-nuke");
   if (loadedSettings.auto_lockdown_enabled && !settings.auto_lockdown_enabled) disabledProtections.push("le lockdown automatique");
   if (loadedSettings.verification_enabled && !settings.verification_enabled) disabledProtections.push("la vérification des membres");
   if (disabledProtections.length && !window.confirm(`Tu vas désactiver ${disabledProtections.join(", ")}. Ton serveur sera moins protégé. Continuer ?`)) return;

@@ -16,6 +16,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
   raid_warning_joins: 5,
   raid_critical_joins: 10,
   antispam_enabled: true,
+  anti_link_enabled: false,
+  block_invites: true,
+  block_external_links: false,
+  anti_scam_enabled: false,
+  anti_nuke_enabled: false,
+  nuke_window_seconds: 30,
+  nuke_action_threshold: 3,
+  nuke_response: "alert",
   spam_window_seconds: 8,
   spam_message_limit: 6,
   spam_duplicate_limit: 3,
@@ -144,7 +152,7 @@ export function validateSettings(input) {
       throw new Error(`${label} est invalide.`);
     }
   }
-  for (const field of ["antiraid_enabled", "auto_lockdown_enabled", "critical_quarantine_all", "antispam_enabled", "verification_enabled"]) {
+  for (const field of ["antiraid_enabled", "auto_lockdown_enabled", "critical_quarantine_all", "antispam_enabled", "verification_enabled", "anti_link_enabled", "block_invites", "block_external_links", "anti_scam_enabled", "anti_nuke_enabled"]) {
     if (typeof input[field] !== "boolean") throw new Error(`${field} est invalide.`);
   }
   const settings = {
@@ -158,6 +166,14 @@ export function validateSettings(input) {
     raid_warning_joins: requireInteger(input.raid_warning_joins, "Le seuil d’alerte", 2, 100),
     raid_critical_joins: requireInteger(input.raid_critical_joins, "Le seuil critique", 3, 200),
     antispam_enabled: input.antispam_enabled,
+    anti_link_enabled: input.anti_link_enabled,
+    block_invites: input.block_invites,
+    block_external_links: input.block_external_links,
+    anti_scam_enabled: input.anti_scam_enabled,
+    anti_nuke_enabled: input.anti_nuke_enabled,
+    nuke_window_seconds: requireInteger(input.nuke_window_seconds, "La fenêtre anti-nuke", 5, 120),
+    nuke_action_threshold: requireInteger(input.nuke_action_threshold, "Le seuil anti-nuke", 2, 10),
+    nuke_response: input.nuke_response,
     spam_window_seconds: requireInteger(input.spam_window_seconds, "La fenêtre anti-spam", 3, 120),
     spam_message_limit: requireInteger(input.spam_message_limit, "La limite de messages", 2, 30),
     spam_duplicate_limit: requireInteger(input.spam_duplicate_limit, "La limite de doublons", 2, 20),
@@ -172,6 +188,9 @@ export function validateSettings(input) {
   }
   if (settings.verification_enabled && (!settings.verification_channel_id || !settings.verification_role_id)) {
     throw new Error("Choisis un salon et un rôle avant d’activer la vérification.");
+  }
+  if (!["alert", "lockdown", "ban"].includes(settings.nuke_response)) {
+    throw new Error("La réaction anti-nuke est invalide.");
   }
   return settings;
 }
