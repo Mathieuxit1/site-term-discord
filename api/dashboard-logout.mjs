@@ -1,8 +1,9 @@
-import { json, readCookie, sessionCookie, supabase } from "./_dashboard.mjs";
+import { isSameDashboardOrigin, json, readCookie, sessionCookie, supabase } from "./_dashboard.mjs";
 
 export default {
   async fetch(request) {
     if (request.method !== "POST") return json({ ok: false, message: "Méthode non autorisée." }, 405);
+    if (!isSameDashboardOrigin(request)) return json({ ok: false, message: "Origine non autorisée." }, 403);
     const sessionId = readCookie(request, "sentinel_dashboard_session");
     if (sessionId && /^[a-f0-9]{64}$/i.test(sessionId)) {
       try {

@@ -10,13 +10,12 @@ import {
 
 const DISCORD_API = "https://discord.com/api/v10";
 const ADMINISTRATOR = 0x8n;
-const MANAGE_GUILD = 0x20n;
 
 function canManageGuild(guild) {
   if (guild.owner === true) return true;
   try {
     const permissions = BigInt(guild.permissions || "0");
-    return (permissions & ADMINISTRATOR) === ADMINISTRATOR || (permissions & MANAGE_GUILD) === MANAGE_GUILD;
+    return (permissions & ADMINISTRATOR) === ADMINISTRATOR;
   } catch {
     return false;
   }

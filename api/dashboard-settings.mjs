@@ -2,6 +2,7 @@ import {
   DEFAULT_SETTINGS,
   getManagedGuild,
   getSession,
+  isSameDashboardOrigin,
   json,
   readJson,
   supabase,
@@ -47,6 +48,7 @@ export default {
       }
 
       if (request.method !== "PUT") return json({ ok: false, message: "Méthode non autorisée." }, 405);
+      if (!isSameDashboardOrigin(request)) return json({ ok: false, message: "Origine non autorisée." }, 403);
       const settings = validateSettings(await readJson(request));
       const payload = { guild_id: guild.id, ...settings, updated_at: new Date().toISOString() };
       const response = await supabase("dashboard_guild_settings?on_conflict=guild_id", {

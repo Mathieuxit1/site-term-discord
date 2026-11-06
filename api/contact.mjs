@@ -1,5 +1,9 @@
+import { supabase } from "./_dashboard.mjs";
+
 const DISCORD_API = "https://discord.com/api/v10";
 const MAX_REQUEST_BYTES = 8_000;
+const RATE_LIMIT_WINDOW_SECONDS = 30 * 60;
+const RATE_LIMIT_MAX_REQUESTS = 3;
 const JSON_HEADERS = {
   "Cache-Control": "no-store",
   "Content-Type": "application/json; charset=utf-8",
@@ -65,8 +69,31 @@ async function discordRequest(path, token, payload) {
 }
 
 function clientIp(request) {
-  const forwarded = request.headers.get("x-forwarded-for");
+  const forwarded = request.headers.get("x-vercel-forwarded-for") || request.headers.get("x-forwarded-for");
   return forwarded ? forwarded.split(",")[0].trim() : "";
+}
+
+async function requestFingerprint(request) {
+  const ip = clientIp(request);
+  if (!ip) throw new Error("No client IP was provided by the hosting platform.");
+  const bytes = new TextEncoder().encode(ip);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function contactRateLimitAllows(request) {
+  const fingerprint = await requestFingerprint(request);
+  const result = await (
+    await supabase("rpc/consume_contact_rate_limit", {
+      method: "POST",
+      body: JSON.stringify({
+        p_fingerprint: fingerprint,
+        p_window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+        p_max_attempts: RATE_LIMIT_MAX_REQUESTS,
+      }),
+    })
+  ).json();
+  return result === true;
 }
 
 export default {
@@ -75,9 +102,9 @@ export default {
       return response({ ok: false, message: "Méthode non autorisée." }, 405);
     }
 
-    const configuredOrigin = process.env.SITE_ORIGIN;
+    const configuredOrigin = (process.env.SITE_ORIGIN || "").trim().replace(/\/$/, "");
     const origin = request.headers.get("origin");
-    if (configuredOrigin && origin && origin !== configuredOrigin) {
+    if (!configuredOrigin || !configuredOrigin.startsWith("https://") || !origin || origin !== configuredOrigin) {
       return response({ ok: false, message: "Origine non autorisée." }, 403);
     }
 
@@ -132,6 +159,15 @@ export default {
       }
     } catch {
       return response({ ok: false, message: "La vérification anti-spam est indisponible. Réessaie plus tard." }, 503);
+    }
+
+    try {
+      if (!(await contactRateLimitAllows(request))) {
+        return response({ ok: false, message: "Trop de demandes ont été envoyées. Réessaie dans 30 minutes." }, 429);
+      }
+    } catch (error) {
+      console.error("Unable to apply the contact form rate limit", error);
+      return response({ ok: false, message: "Le formulaire est momentanément indisponible. Réessaie plus tard." }, 503);
     }
 
     try {

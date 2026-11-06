@@ -1,4 +1,4 @@
-import { getManagedGuild, getSession, json, readJson, supabase } from "./_dashboard.mjs";
+import { getManagedGuild, getSession, isSameDashboardOrigin, json, readJson, supabase } from "./_dashboard.mjs";
 
 const ID = /^[A-Za-z0-9_-]{8,32}$/;
 const SNOWFLAKE = /^\d{17,20}$/;
@@ -108,6 +108,7 @@ export default {
       }
 
       if (request.method !== "PUT") return json({ ok: false, message: "Méthode non autorisée." }, 405);
+      if (!isSameDashboardOrigin(request)) return json({ ok: false, message: "Origine non autorisée." }, 403);
       const panels = validatePanels(await readJson(request, 60_000));
       const payload = { guild_id: auth.guild.id, panels, updated_at: new Date().toISOString() };
       const response = await supabase("dashboard_ticket_settings?on_conflict=guild_id", {
@@ -119,7 +120,7 @@ export default {
       return json({ ok: true, guild: auth.guild, settings: rows[0] || payload });
     } catch (error) {
       console.error("Dashboard ticket settings request failed", error);
-      return json({ ok: false, message: error instanceof Error ? error.message : "Impossible d’enregistrer les tickets pour le moment." }, 400);
+      return json({ ok: false, message: "Impossible d’enregistrer les tickets pour le moment." }, 400);
     }
   },
 };

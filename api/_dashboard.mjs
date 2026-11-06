@@ -3,7 +3,8 @@ const JSON_HEADERS = {
   "Content-Type": "application/json; charset=utf-8",
 };
 
-const COOKIE_MAX_AGE = 60 * 60 * 8;
+// A short-lived dashboard session limits the impact of a lost browser session.
+const COOKIE_MAX_AGE = 60 * 60 * 2;
 
 export const DEFAULT_SETTINGS = Object.freeze({
   security_log_channel_id: null,
@@ -42,6 +43,14 @@ export function configuredOrigin() {
   const origin = (process.env.DASHBOARD_ORIGIN || "").trim().replace(/\/$/, "");
   if (!origin.startsWith("https://")) throw new Error("DASHBOARD_ORIGIN must be an HTTPS URL.");
   return origin;
+}
+
+export function isSameDashboardOrigin(request) {
+  try {
+    return request.headers.get("origin") === configuredOrigin();
+  } catch {
+    return false;
+  }
 }
 
 export function readCookie(request, name) {
@@ -102,6 +111,13 @@ export async function supabase(path, options = {}) {
 export async function createSession({ user, guilds }) {
   const sessionId = randomToken();
   const expiresAt = new Date(Date.now() + COOKIE_MAX_AGE * 1000).toISOString();
+  // Best effort cleanup keeps expired Discord account data out of the database.
+  try {
+    const now = encodeURIComponent(new Date().toISOString());
+    await supabase(`dashboard_sessions?expires_at=lt.${now}`, { method: "DELETE" });
+  } catch (error) {
+    console.warn("Unable to clean expired dashboard sessions", error);
+  }
   await supabase("dashboard_sessions", {
     method: "POST",
     headers: { Prefer: "return=minimal" },
